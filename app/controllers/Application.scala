@@ -43,6 +43,6 @@ object Application extends Controller {
   }
 
   def view = Action{ request => 
-    Ok("ok...")    
+    Ok("ok...") 
   }
 }
