@@ -43,6 +43,13 @@ object Application extends Controller {
   }
 
   def view = Action{ request => 
-    Ok("ok...") 
+    Ok("Welcome")
+  }
+
+  def speakerView = Action{ request => 
+    // FIX : use form instead
+    println(request.body)
+    println(request.body.asFormUrlEncoded.get("url"))
+    request.body.asFormUrlEncoded.get("url").headOption.map(url => Ok(views.html.speaker(5, url))).getOrElse(BadRequest)
   }
 }
