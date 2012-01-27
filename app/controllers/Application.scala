@@ -14,7 +14,7 @@ object Application extends Controller {
   def list = Action { request =>
     //live stream list 
     val streams = LiveStream.findAll()
-    Ok(views.html.list(list))
+    Ok(views.html.list(streams))
   }
 
   def initPrez = Action { request =>
