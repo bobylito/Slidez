@@ -14,7 +14,7 @@ object Application extends Controller {
   }
   
   def initPrez = Action { request =>
-    //Prez annoncŽe
+    //announced Prez
   }
   
   def broadCast = Action { request =>
