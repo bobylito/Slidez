@@ -33,7 +33,7 @@ object LiveStream {
   }
 
   
-  def findAll : Seq[LiveStream] = {
+  def findAll() : Seq[LiveStream] = {
     DB.withConnection { implicit connection => 
       SQL(""" 
           select * from livestream
@@ -59,7 +59,7 @@ object LiveStream {
        SQL(
          """
            insert into livestream values (
-             NULL, {name}, {url}
+           {id}, {name}, {url}
            )
          """
        ).on(
