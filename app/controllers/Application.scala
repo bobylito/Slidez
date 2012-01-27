@@ -2,6 +2,7 @@ package controllers
 
 import play.api._
 import play.api.mvc._
+import models.LiveStream
 
 object Application extends Controller {
 
@@ -11,7 +12,8 @@ object Application extends Controller {
 
   def list = Action { request =>
     //live stream list 
-    Ok("list")
+    val streams = LiveStream.findAll()
+    Ok(views.html.Application.list(streams))
   }
 
   def initPrez = Action { request =>
