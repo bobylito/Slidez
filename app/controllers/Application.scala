@@ -38,4 +38,8 @@ object Application extends Controller {
     //Push state to the client and archive 
     Ok("stopPrez")
   }
+
+  def view = Action{ request => 
+    Ok("ok...")    
+  }
 }
