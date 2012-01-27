@@ -3,6 +3,7 @@ package controllers
 import play.api._
 import play.api.mvc._
 import models.LiveStream
+import scala.collection.immutable 
 
 object Application extends Controller {
 
@@ -13,7 +14,7 @@ object Application extends Controller {
   def list = Action { request =>
     //live stream list 
     val streams = LiveStream.findAll()
-    Ok(views.html.Application.list(streams))
+    Ok(views.html.list(list))
   }
 
   def initPrez = Action { request =>
