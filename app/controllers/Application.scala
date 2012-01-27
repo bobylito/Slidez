@@ -6,7 +6,30 @@ import play.api.mvc._
 object Application extends Controller {
   
   def index = Action {
-    Ok(views.html.index("Your new application is ready."))
+    list()
   }
   
+  def list = Action { request => 
+    //TODO response
+  }
+  
+  def initPrez = Action { request =>
+    //Prez annoncŽe
+  }
+  
+  def broadCast = Action { request =>
+    //To the clients 
+  }
+  
+  def listen = Action { request =>
+      //Client content fetching 
+  }
+  
+  def startPrez = Action { request =>
+    //Push state to the client 
+  }
+  
+  def  stopPrez = Action { request =>
+    //Push state to the client and archive 
+  }
 }
