@@ -8,13 +8,9 @@ import scala.collection.immutable
 object Application extends Controller {
 
   def index = Action {
-    list()
-  }
-
-  def list = Action { request =>
     //live stream list 
     val streams = LiveStream.findAll()
-    Ok(views.html.list(streams))
+    Ok(views.html.index(streams))
   }
 
   def initPrez = Action { request =>
@@ -47,9 +43,10 @@ object Application extends Controller {
   }
 
   def speakerView = Action{ request => 
-    // FIX : use form instead
-    println(request.body)
-    println(request.body.asFormUrlEncoded.get("url"))
-    request.body.asFormUrlEncoded.get("url").headOption.map(url => Ok(views.html.speaker(5, url))).getOrElse(BadRequest)
+    request.body.asFormUrlEncoded.get("url")
+        .headOption
+        .map(url => Ok(views.html.speaker(5, url)))
+        .getOrElse(BadRequest)
+
   }
 }

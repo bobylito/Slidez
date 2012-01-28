@@ -1,7 +1,21 @@
-@(message: String)
+@(livePrez : Seq[models.LiveStream])
 
-@main("Welcome to Play 2.0") {
-    
-    @play20.welcome(message)
-    
+@main("SlideZ"){
+<h2>Nouvelle présentation</h2>
+
+  @helper.form(action=routes.Application.speakerView){
+    <label for="url">Url de votre presentation</label>
+    <input type="url" id="url" name="url"/>
+    <input type="submit"/> 
+  }
+
+<h2>Présentations en cours</h2>
+<ul>
+  
+</ul>
+
+<script type="text/javascript">
+  jQuery(function($){
+  }) 
+</script>
 }

@@ -4,7 +4,6 @@
 
 # Home page
 GET     /                               controllers.Application.index
-GET     /list                           controllers.Application.list
 GET     /initPrez                       controllers.Application.initPrez
 GET     /broadCast                      controllers.Application.broadCast
 GET     /startPrez                      controllers.Application.startPrez
