@@ -5,7 +5,7 @@
 # Home page
 GET     /                               controllers.Application.index
 GET     /initPrez                       controllers.Application.initPrez
-GET     /broadCast                      controllers.Application.broadCast
+POST     /broadCast                      controllers.Application.broadCast
 GET     /startPrez                      controllers.Application.startPrez
 GET     /stopPrez                       controllers.Application.stopPrez
 GET     /view                           controllers.Application.view

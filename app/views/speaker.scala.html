@@ -1,7 +1,5 @@
 @(idPresentation: Int, url: String)
-<!DOCTYPE html>
-
-<meta charset="utf8">
+@main("SlideZ"){
 <title>Slidez</title>
 
 <div id="present">
@@ -20,6 +18,9 @@
 </div>
 
 <div id="slidecount">?</div>
+
+<button id="startStop-button" onclick="Dz.switchBroadcast()">Start/Stop</button>
+
 <button id="popup-button" onclick="Dz.popup()">Pop-up</button>
 
 <div id="time">
@@ -133,9 +134,34 @@
     width: 200px;
     right: 20px;
   }
+  
+  #startStop-button {
+    bottom: 116px;
+    background: #888;
+    border: none;
+    border-radius: 10px;
+    color: #FFF;
+    cursor: pointer;
+    height: 52px;
+    font-size: 30px;
+    font-weight: bold;
+    position: absolute;
+    right: 20px;
+    width: 200px;
+    z-index: 10;
+  }
+  #startStop-button.stop {
+    color:red;
+    background-color:#999
+  }
+  #startStop-button.start {
+    color:#FFF;
+    background-color:red
+  }
+
 
   #popup-button {
-    bottom: 88px;
+    bottom: 58px;
     background: #888;
     border: none;
     border-radius: 10px;
@@ -160,7 +186,6 @@
   };
   
   Dz.init = function() {
-    this.startClock();
     this.loadIframes();
   }
   
@@ -199,9 +224,18 @@
       this.toggleContent();
     }
   }
-  
+
+  Dz.broadcast = function(idx){
+    // Do nothing by default
+    jQuery.post("@routes.Application.broadCast",
+      { id : "@idPresentation",
+        page : idx }
+    )
+  }
+
   Dz.onmessage = function(aEvent) {
     var argv = aEvent.data.split(" "), argc = argv.length;
+    console.log(argv, argc)
     argv.forEach(function(e, i, a) { a[i] = decodeURIComponent(e) });
     if (argv[0] === "CURSOR" && argc === 2) {
       if (aEvent.source === this.views.present) {
@@ -211,6 +245,7 @@
         this.idx = ~~cursor[0];
         this.step = ~~cursor[1];
         $("#slideidx").innerHTML = argv[1];
+        Dz.broadcast(argv[1]);
         this.postMsg(this.views.future, "SET_CURSOR", this.idx + "." + (this.step + 1));
         if (this.views.remote)
           this.postMsg(this.views.remote, "SET_CURSOR", argv[1]);
@@ -229,20 +264,8 @@
   /* Get url from hash or prompt and store it */
   
   Dz.getUrl = function() {
+    // The url is get from template
     return "@url"
-    var u = window.location.hash.split("#")[1];
-    if (!u) {
-      u = window.prompt("What is the URL of the slides?");
-      if (u) {
-        window.location.hash = u.split("#")[0];
-        return u;
-      }
-      u = "<style>body{background-color:white;color:black}</style>";
-      u += "<strong>ERROR:</strong> No URL specified.<br>";
-      u += "Try<em>: " + document.location + "#yourslides.html</em>";
-      u = "data:text/html," + encodeURIComponent(u);
-    }
-    return u;
   }
   
   Dz.loadIframes = function() {
@@ -300,16 +323,28 @@
     aWin.postMessage(aMsg.join(" "), "*");
   }
   
-  Dz.startClock = function() {
-    var addZero = function(num) {
-      return num < 10 ? '0' + num : num;
-    }
+  Dz.startClock = function(startTime) {
+    var         addZero = function(num) {
+          return num < 10 ? '0' + num : num;
+        }
     setInterval(function() {
-      var now = new Date();
-      $("#hours").innerHTML = addZero(now.getHours());
-      $("#minutes").innerHTML = addZero(now.getMinutes());
-      $("#seconds").innerHTML = addZero(now.getSeconds());
+      var now = new Date(), 
+          elapsed = new Date(now.getTime() - startTime.getTime());
+      $("#hours").innerHTML = addZero(elapsed.getUTCHours());
+      $("#minutes").innerHTML = addZero(elapsed.getUTCMinutes());
+      $("#seconds").innerHTML = addZero(elapsed.getUTCSeconds());
     }, 1000);
+  }
+
+  Dz.switchBroadcast = function(){
+    var startTime = new Date();
+
+    //Clock tick!
+    this.startClock(startTime);
+
+    //bind all key events ??
+    //change page callback?
+
   }
   
   window.onload = Dz.init.bind(Dz);
@@ -361,3 +396,5 @@
   }
 
 </script>
+
+}
