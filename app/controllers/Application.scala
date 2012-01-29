@@ -29,13 +29,11 @@ object Application extends Controller {
   )
 
   def broadCast = Action { implicit request =>
-    val log = broadcastForm.bindFromRequest().fold(
+    broadcastForm.bindFromRequest().fold(
       formWithErrors => BadRequest("NOT GOOD! Try again"),
-      {case (id, page) => println("Page actuelle" + page)}
+      {case (id, page) => println("Page actuelle" + page)
+                          Ok("broadCast")}
     ) 
-    //println("ID "+id.)
-    //To the clients 
-    Ok("broadCast")
   }
 
   def listen = Action { request =>

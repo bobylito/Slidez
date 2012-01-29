@@ -227,10 +227,6 @@
 
   Dz.broadcast = function(idx){
     // Do nothing by default
-    jQuery.post("@routes.Application.broadCast",
-      { id : "@idPresentation",
-        page : idx }
-    )
   }
 
   Dz.onmessage = function(aEvent) {
@@ -324,27 +320,45 @@
   }
   
   Dz.startClock = function(startTime) {
-    var         addZero = function(num) {
+    var addZero = function(num) {
           return num < 10 ? '0' + num : num;
+        },
+        ticTac = function() {
+          var now = new Date(), 
+              elapsed = new Date(now.getTime() - startTime.getTime());
+          $("#hours").innerHTML = addZero(elapsed.getUTCHours());
+          $("#minutes").innerHTML = addZero(elapsed.getUTCMinutes());
+          $("#seconds").innerHTML = addZero(elapsed.getUTCSeconds());
         }
-    setInterval(function() {
-      var now = new Date(), 
-          elapsed = new Date(now.getTime() - startTime.getTime());
-      $("#hours").innerHTML = addZero(elapsed.getUTCHours());
-      $("#minutes").innerHTML = addZero(elapsed.getUTCMinutes());
-      $("#seconds").innerHTML = addZero(elapsed.getUTCSeconds());
-    }, 1000);
+    return setInterval(ticTac, 1000);
   }
 
   Dz.switchBroadcast = function(){
-    var startTime = new Date();
+    if(!this.startTime){
+      this.startTime = new Date()
 
-    //Clock tick!
-    this.startClock(startTime);
+      //Clock tick!
+      this.clockIntervalID = this.startClock(this.startTime)
 
-    //bind all key events ??
-    //change page callback?
+      this.broadcast = function(idx){
+        jQuery.post("@routes.Application.broadCast",
+          { id : "@idPresentation",
+            page : idx 
+          }
+        )
+      }
 
+      this.broadcast(this.idx+'.'+this.step)
+
+      $("#startStop-button").className= "start"
+    }
+    else{
+      this.startTime = undefined
+      this.broadcast = function(){}
+      clearInterval(this.clockIntervalID)
+      this.clockIntervalID = undefined
+      $("#startStop-button").className = ""
+    }
   }
   
   window.onload = Dz.init.bind(Dz);
