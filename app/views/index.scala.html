@@ -16,6 +16,11 @@
 
 <script type="text/javascript">
   jQuery(function($){
+    var source = new EventSource("liveToto")
+
+    source.addEventListener("totoEvent", function(e){
+      console.log(e.data); 
+    })
   }) 
 </script>
 }

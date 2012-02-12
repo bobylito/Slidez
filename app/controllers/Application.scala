@@ -6,6 +6,18 @@ import models.LiveStream
 import scala.collection.immutable 
 import play.api.data._
 import play.api.data.Forms._
+import play.api.libs.iteratee._
+import play.api.libs.concurrent._
+import lib._
+import play.api.http._
+
+import akka.util.Timeout
+import akka.util.duration._
+
+import actors.PresentationWorker
+import actors.PresentationWorker._
+
+import akka.pattern.ask
 
 object Application extends Controller {
 
@@ -32,6 +44,7 @@ object Application extends Controller {
     broadcastForm.bindFromRequest().fold(
       formWithErrors => BadRequest("NOT GOOD! Try again"),
       {case (id, page) => println("Page actuelle" + page)
+                          PresentationWorker.ref ! ChangePage(page)
                           Ok("broadCast")}
     ) 
   }
@@ -51,8 +64,21 @@ object Application extends Controller {
     Ok("stopPrez")
   }
 
+  val eventEnum = SSEvent[String](eventName = "page-change")
+
+  /*
+ */
+  def viewStream = Action {
+    AsyncResult {
+      implicit val timeout = Timeout(5 second)
+      (PresentationWorker.ref ? Listen).mapTo[Enumerator[String]].asPromise.map({chunks =>{
+        Ok.stream(chunks &> eventEnum)(writeable = Writeable.wString, contentTypeOf = ContentTypeOf[String](Some(ContentTypes.EVENT_STREAM)))
+      } })
+    }
+  }  
+
   def view = Action{ request => 
-    Ok("Welcome")
+    Ok(views.html.view())
   }
 
   def speakerView = Action{ request => 
@@ -60,5 +86,18 @@ object Application extends Controller {
         .headOption
         .map(url => Ok(views.html.speaker(5, url)))
         .getOrElse(BadRequest)
+  }
+
+
+  lazy val toto : Enumerator[String] = {
+    Enumerator.fromCallback { () => 
+      Promise.timeout(Some("toto"), 100 milliseconds)    
+    }
+  }
+
+
+  def liveToto = Action {
+    Ok.stream(toto &> SSEvent(eventName = "totoEvent"))(writeable = Writeable.wString, contentTypeOf =
+      ContentTypeOf[String](Some(ContentTypes.EVENT_STREAM)))
   }
 }
