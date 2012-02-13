@@ -58,8 +58,8 @@ object LiveStream {
      DB.withTransaction { implicit connection =>
        SQL(
          """
-           insert into livestream values (
-           {id}, {name}, {url}
+           insert into livestream ( name, url) values (
+           {name}, {url}
            )
          """
        ).on(

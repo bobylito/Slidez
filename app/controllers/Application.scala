@@ -19,6 +19,9 @@ import actors.PresentationWorker._
 
 import akka.pattern.ask
 
+import anorm._
+
+
 object Application extends Controller {
 
   def index = Action {
@@ -32,7 +35,6 @@ object Application extends Controller {
     Ok("initPrez")
   }
 
-
   val broadcastForm = Form(
     tuple (
       "id" -> number,
@@ -43,8 +45,7 @@ object Application extends Controller {
   def broadCast = Action { implicit request =>
     broadcastForm.bindFromRequest().fold(
       formWithErrors => BadRequest("NOT GOOD! Try again"),
-      {case (id, page) => println("Page actuelle" + page)
-                          PresentationWorker.ref ! ChangePage(page)
+      {case (id, page) => PresentationWorker.ref ! ChangePage(page)
                           Ok("broadCast")}
     ) 
   }
@@ -71,33 +72,30 @@ object Application extends Controller {
   def viewStream = Action {
     AsyncResult {
       implicit val timeout = Timeout(5 second)
-      (PresentationWorker.ref ? Listen).mapTo[Enumerator[String]].asPromise.map({chunks =>{
-        Ok.stream(chunks &> eventEnum)(writeable = Writeable.wString, contentTypeOf = ContentTypeOf[String](Some(ContentTypes.EVENT_STREAM)))
-      } })
+      (PresentationWorker.ref ? Listen).mapTo[Enumerator[String]].asPromise.map({ in =>
+        SimpleResult(
+          header = ResponseHeader(OK, Map(
+                      CONTENT_LENGTH -> "-1",
+                      CONTENT_TYPE -> "text/event-stream"
+                  )), 
+          in &> eventEnum)
+      })
     }
   }  
 
-  def view = Action{ request => 
-    Ok(views.html.view())
+
+  def view(url : String) = Action{ request =>
+    Ok(views.html.view(url))
   }
 
   def speakerView = Action{ request => 
     request.body.asFormUrlEncoded.get("url")
         .headOption
-        .map(url => Ok(views.html.speaker(5, url)))
+        .map(url => {
+            LiveStream.create(LiveStream(NotAssigned, "toto", url)) 
+            Ok(views.html.speaker(5, url)) 
+          })
         .getOrElse(BadRequest)
   }
 
-
-  lazy val toto : Enumerator[String] = {
-    Enumerator.fromCallback { () => 
-      Promise.timeout(Some("toto"), 100 milliseconds)    
-    }
-  }
-
-
-  def liveToto = Action {
-    Ok.stream(toto &> SSEvent(eventName = "totoEvent"))(writeable = Writeable.wString, contentTypeOf =
-      ContentTypeOf[String](Some(ContentTypes.EVENT_STREAM)))
-  }
 }

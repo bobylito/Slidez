@@ -11,7 +11,9 @@
 
 <h2>Présentations en cours</h2>
 <ul>
-  
+  @livePrez.map { prez => 
+    <li><a href="@routes.Application.view(prez.url)">@prez.name</li>
+  } 
 </ul>
 
 <script type="text/javascript">

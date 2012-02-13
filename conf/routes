@@ -5,13 +5,12 @@
 # Home page
 GET     /                               controllers.Application.index
 GET     /initPrez                       controllers.Application.initPrez
-POST     /broadCast                      controllers.Application.broadCast
+POST    /broadCast                      controllers.Application.broadCast
 GET     /startPrez                      controllers.Application.startPrez
 GET     /stopPrez                       controllers.Application.stopPrez
-GET     /view                           controllers.Application.view
+GET     /view                           controllers.Application.view(url)
 POST    /speakerview                    controllers.Application.speakerView
-GET     /liveToto                           controllers.Application.liveToto
-GET     /viewStream                           controllers.Application.viewStream
+GET     /viewStream                     controllers.Application.viewStream
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
