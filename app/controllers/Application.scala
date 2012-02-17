@@ -92,7 +92,7 @@ object Application extends Controller {
     request.body.asFormUrlEncoded.get("url")
         .headOption
         .map(url => {
-            LiveStream.create(LiveStream(NotAssigned, "toto", url)) 
+            LiveStream.create(LiveStream(NotAssigned, "Presentation hackday slidez", url)) 
             Ok(views.html.speaker(5, url)) 
           })
         .getOrElse(BadRequest)

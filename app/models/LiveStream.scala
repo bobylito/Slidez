@@ -54,7 +54,6 @@ object LiveStream {
   
   
     def create(livestream: LiveStream): Int = {
-     //TODO : id generator
      DB.withTransaction { implicit connection =>
        SQL(
          """
