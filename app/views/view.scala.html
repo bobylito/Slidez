@@ -1,4 +1,4 @@
-@(url : String)
+@(url : String, idPresentation : Long)
 
 <!DOCTYPE HTML>
 <html lang="en">
@@ -18,12 +18,16 @@
 
 <div id="bandal">
   <h1>Slidez</h1>
+  <span id=title></span>
+  <span id=slideidx></span>
+  <span id=slidecount></span>
 </div>
 <iframe></iframe>
 
 <script type="text/javascript">
+  jQuery.noConflict()
   jQuery(function($){
-    var source = new EventSource("viewStream"),
+    var source = new EventSource("@routes.Application.viewStream(idPresentation)"),
         $prez = $("#prez")
     source.addEventListener("page-change", function(e){
       Dz.setCursor(e.data)
@@ -88,8 +92,6 @@
         this.idx = ~~cursor[0];
         this.step = ~~cursor[1];
         $("#slideidx").value = this.idx;
-        $("#back").disabled = this.idx == 1;
-        $("#forward").disabled = this.idx == this.count;
       }
       if (argv[0] === "REGISTERED" && argc === 3) {
         $("#slidecount").innerHTML = this.count = argv[2];

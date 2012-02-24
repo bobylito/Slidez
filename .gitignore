@@ -4,3 +4,8 @@ project/target
 target
 tmp
 *.swp
+.cache
+.classpath
+.project
+.settings/
+*.class

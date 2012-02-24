@@ -12,8 +12,14 @@
 <h2>Présentations en cours</h2>
 <ul>
   @livePrez.map { prez => 
-    <li><a href="@routes.Application.view(prez.url)">@prez.name</li>
+  <li><a href="@routes.Application.view(prez.id.get)">@prez.name</a></li>
   } 
 </ul>
 
+<h2>Présentations en cours (admin)</h2>
+<ul>
+  @livePrez.map { prez => 
+  <li><a href="@routes.Application.speakerViewAgain(prez.id.get)">@prez.name</a></li>
+  } 
+</ul>
 }
