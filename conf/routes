@@ -4,14 +4,12 @@
 
 # Home page
 GET     /                               controllers.Application.index
-GET     /initPrez                       controllers.Application.initPrez
 POST    /broadCast                      controllers.Application.broadCast
-GET     /startPrez                      controllers.Application.startPrez
-GET     /stopPrez                       controllers.Application.stopPrez
 GET     /view/:id                       controllers.Application.view(id : Long)
 POST    /speakerview                    controllers.Application.speakerView
 GET     /speakerview/:id                controllers.Application.speakerViewAgain(id : Long)
 GET     /viewStream/:id                 controllers.Application.viewStream(id : Long)
+PUT     /slides/:id                     controllers.Application.updateSlidesName(id: Long, name: String)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

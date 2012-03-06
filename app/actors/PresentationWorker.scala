@@ -10,38 +10,32 @@ import scala.collection.mutable.Set
 class PresentationWorker extends Actor {
   import PresentationWorker._
 
-  var audiences: Map[Long, Set[Pushee[String]]] = Map()
+  var audiences: Map[Long, Set[PushEnumerator[String]]] = Map()
 
   def receive = {
     case Listen(id) => {
-      audiences.get(id) match {
-        case Some(audience) => {
-          lazy val channel : Enumerator[String] = Enumerator.pushee(
-            pushee => {
-              audience += pushee 
-            }, onComplete = self ! Quit)
-          sender ! channel
-        }
-        case None => {
-
-        }
-      }
+      audiences.get(id).map( audience => {
+        lazy val channel : PushEnumerator[String] = Enumerator.imperative( 
+          onStart = {audience += channel},
+          onComplete = { self ! Quit(channel)}, 
+          onError = (a, b) => {  println("Error") }
+        )
+        sender ! channel
+      })
     }
     case ChangePage(id, page) => {
-      audiences.get(id) match {
-        case Some(audience) => {
-          audience.foreach(_.push(page))
-        }
-        case None => {
-
-        }
-      }
+      audiences.get(id).map( audience => {
+        audience.foreach( p => {
+            p.push(page)
+          })
+        })
     }
-    case Quit => {
+    case Quit(quitter) => {
+      quitter.close()
       println("Quit!")
     }
     case NewPresentation(id) => {
-      audiences += (id -> Set.empty[Pushee[String]])
+      audiences += (id -> Set.empty[PushEnumerator[String]])
     }
   }
 }
@@ -49,9 +43,8 @@ class PresentationWorker extends Actor {
 object PresentationWorker {
   sealed trait Message
 
-  case object Quit extends Message
-
   case class Listen(id: Long) extends Message
+  case class Quit(quitter : PushEnumerator[String]) extends Message
   case class ChangePage(id: Long, page: String) extends Message
   case class NewPresentation(id: Long) extends Message
 

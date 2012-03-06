@@ -1,4 +1,4 @@
-@(url : String, idPresentation : Long)
+@(url : String, idPresentation : Long, currentSlide : Option[String])
 
 <!DOCTYPE HTML>
 <html lang="en">
@@ -11,7 +11,7 @@
   *{margin:0;padding:0; font-family:Helvetica, Calibri, Arial, sans-serif}
   iframe, #bandal{position:absolute; top:0; left:0; height:100%; width:100%}
   #bandal{height:20px; z-index: 1; background:rgba(255,255,255,0.7);line-height:20px}
-  h1{font-size:17px; line-height:inherit}
+  h1, span{font-size:17px; line-height:inherit; display:inline-block}
   </style>
 </head>
 <body>
@@ -24,17 +24,6 @@
 </div>
 <iframe></iframe>
 
-<script type="text/javascript">
-  jQuery.noConflict()
-  jQuery(function($){
-    var source = new EventSource("@routes.Application.viewStream(idPresentation)"),
-        $prez = $("#prez")
-    source.addEventListener("page-change", function(e){
-      Dz.setCursor(e.data)
-    })
-  })
-</script>
-
 <script>
   var Dz = {
     view: null,
@@ -44,7 +33,23 @@
   };
   
   Dz.init = function() {
-    this.loadIframe();
+    this.loadIframe(function initEventSource(){
+      var source = new EventSource("@routes.Application.viewStream(idPresentation)")
+      source.addEventListener("page-change", function(e){
+        Dz.setCursor(e.data)
+      })
+      window.addEventListener("close", function(){
+        source.close()
+      })
+      @currentSlide match {
+        case Some(slide) => {
+          Dz.setCursor("@slide")
+        }
+        case None => {
+          Dz.setCursor("1.0")
+        }
+      }
+    });
   }
   
   Dz.onkeydown = function(aEvent) {
@@ -107,12 +112,13 @@
     return u
   }
   
-  Dz.loadIframe = function() {
+  Dz.loadIframe = function(f) {
     var iframe = $("iframe");
     iframe.src = this.url = this.getUrl();
     iframe.onload = function() {
       Dz.view = this.contentWindow;
       Dz.postMsg(Dz.view, "REGISTER");
+      f()
     }
   }
   

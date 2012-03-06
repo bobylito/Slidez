@@ -12,12 +12,21 @@ object LogSlide {
 
   def insert(log: LogSlide) : Option[Long]= {
     DB.withConnection { implicit connection => 
-      SQL("insert into logslide(prezid, slide, tick) set({prezid}, {slide}, {tick})")
+      SQL("insert into logslide(prezid, slide, tick) VALUES ({prezid}, {slide}, {tick})")
           .on(
               'prezid -> log.prezid,
               'slide -> log.slide,
-              'tick -> log.tick
+              'tick -> new Time(log.tick)
           ).executeInsert()
+    }
+  }
+  
+  def lastShownSlide(id : Long) : Option[String] = {
+    DB.withConnection { implicit connection => 
+      SQL( "select slide from logslide where prezid={id} and tick = (select max(tick) from logslide where prezid={id}) " )
+          .on(
+              'id -> id
+          ).as(scalar[String].singleOpt)
     }
   }
   

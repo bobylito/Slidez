@@ -19,15 +19,13 @@ import models.LogSlide
 
 object Application extends Controller {
 
+  /** 
+   *  INDEX 
+   */
   def index = Action {
     //live stream list 
     val streams = LiveStream.findAll()
     Ok(views.html.index(streams))
-  }
-
-  def initPrez = Action { request =>
-    //announced Prez
-    Ok("initPrez")
   }
 
   val broadcastForm = Form(
@@ -35,37 +33,62 @@ object Application extends Controller {
       "id" -> number,
       "page" -> nonEmptyText,
       "tick" -> number))
+/**
+ * Creates the database entry and display the slides
+ */
+  def speakerView = Action { request =>
+    request.body.asFormUrlEncoded.get("url")
+      .headOption
+      .map(url => {
+        LiveStream.create( LiveStream(NotAssigned, "Presentation hackday slidez", url) )
+          .map(id => {
+            PresentationWorker.ref ! NewPresentation(id)
+            Ok(views.html.speaker(id, url))
+          })
+          .getOrElse( BadRequest )
+        })
+      .getOrElse( BadRequest )
+  }
 
+  /**
+   * Restore a previously entered presentation
+   */
+  def speakerViewAgain(id: Long) = Action { request =>
+    LiveStream.findById(id)
+      .map( l => {
+        Ok(views.html.speaker(l.id.get, l.url))
+      })
+      .getOrElse(BadRequest )
+  }
+
+  /**
+   * Update the state of the slides and broadcast the info to listeners
+   */
   def broadCast = Action { implicit request =>
     broadcastForm.bindFromRequest().fold(
       formWithErrors => BadRequest("NOT GOOD! Try again"),
       {
         case (id, page, tick) =>
+          print(tick)
           LogSlide.insert(LogSlide(NotAssigned, id, page, tick))
           PresentationWorker.ref ! ChangePage(id, page)
           Ok("broadCast")
       })
   }
 
-  def listen = Action { request =>
-    //Client content fetching 
-    Ok("listen")
+  def updateSlidesName(id: Long, name: String) = Action { 
+    LiveStream.update(id, name)
+    Ok("Updated")
   }
 
-  def startPrez = Action { request =>
-    //Push state to the client 
-    Ok("startPrez")
-  }
-
-  def stopPrez = Action { request =>
-    //Push state to the client and archive 
-    Ok("stopPrez")
+  def view(id: Long) = Action { request =>
+    LiveStream.findById(id)
+      .map(l => {Ok(views.html.view(l.url, l.id.get, LogSlide.lastShownSlide(id)))})
+      .getOrElse( { BadRequest })
   }
 
   val eventEnum = SSEvent[String](eventName = "page-change")
 
-  /*
- */
   def viewStream(id: Long) = Action {
     LiveStream.findById(id) match {
       case Some(l: LiveStream) => {
@@ -83,51 +106,6 @@ object Application extends Controller {
       }
       case None => {
         BadRequest("")
-      }
-    }
-  }
-  
-  def listeners = Action{
-    Ok
-  }
-
-  def view(id: Long) = Action { request =>
-    LiveStream.findById(id) match {
-      case Some(l: LiveStream) => {
-        Ok(views.html.view(l.url, l.id.get))
-      }
-      case None => {
-        BadRequest
-      }
-
-    }
-
-  }
-
-  def speakerView = Action { request =>
-    request.body.asFormUrlEncoded.get("url")
-      .headOption
-      .map(url => {
-        LiveStream.create(LiveStream(NotAssigned, "Presentation hackday slidez", url)) match {
-          case Some(id) => {
-            PresentationWorker.ref ! NewPresentation(id)
-            Ok(views.html.speaker(id, url))
-          }
-          case None => {
-            BadRequest
-          }
-        }
-      })
-      .getOrElse(BadRequest)
-  }
-
-  def speakerViewAgain(id: Long) = Action { request =>
-    LiveStream.findById(id) match {
-      case Some(l: LiveStream) => {
-        Ok(views.html.speaker(l.id.get, l.url))
-      }
-      case None => {
-        BadRequest
       }
     }
   }

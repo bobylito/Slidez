@@ -1,7 +1,5 @@
 @(title: String)(content: Html)
-
 <!DOCTYPE html>
-
 <html>
     <head>
         <title>@title</title>
@@ -13,8 +11,10 @@
       jQuery.noConflict()
     </script>
     <body>
-      <section id="main">
+      <header id="head">
         <h1>Slidez</h1>
+      </header>
+      <section id="main">
         @content
       </section>
     </body>

@@ -61,4 +61,15 @@ object LiveStream {
     }
   }
 
+  def update(id : Long, title: String) =  {
+    DB.withTransaction { implicit connection => 
+      SQL("UPDATE livestream SET name={name} WHERE id={id}")
+        .on(
+            'name -> title,
+            'id -> id
+          )
+        .executeUpdate()
+    }
+  }
+
 }

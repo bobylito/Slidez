@@ -1,5 +1,16 @@
-*{margin: 0; padding: 0; font-family: helvetica, calibri}
-body{text-align:center;}
-h1, h2, h3{}
+/* 
+ * Colors based on Good Friends : http://www.colourlovers.com/palette/77121/Good_Friends#
+ *
+ *  
+ *
+ * */
+*{margin: 0; padding: 0; font-family: helvetica, calibri; color : #948C75}
+body{text-align:center; background : #D5DED9}
+h1, h2, h3{ color : #7A6A53}
+ul{list-style-position: inside;}
 
-#main{ width: 960px; margin: auto; text-align: left}
+#main, #head{ width: 960px; margin: auto; text-align: left; padding:10px; background: #99b2b7}
+#head {background: #D9CEB2}
+
+#main > h2{margin-top: 10px}
+#main > h2:first-child{ margin-top:0px}

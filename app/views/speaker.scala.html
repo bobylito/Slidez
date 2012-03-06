@@ -335,15 +335,17 @@
 
   Dz.switchBroadcast = function(){
     if(!this.startTime){
-      this.startTime = new Date()
+      var startTime = this.startTime = new Date()
 
       //Clock tick!
       this.clockIntervalID = this.startClock(this.startTime)
 
       this.broadcast = function(idx){
+        var now = (new Date()).getTime() - startTime.getTime()
         jQuery.post("@routes.Application.broadCast",
           { id : "@idPresentation",
-            page : idx 
+            page : idx,
+            tick : now
           }
         )
       }
