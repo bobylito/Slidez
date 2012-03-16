@@ -6,7 +6,7 @@ It works with any slides given they are compatible with DZSlides' post message p
 
 ## Techs
 
-Play 2 + open web + DZSlide + boostrap
+Play 2 + open web + DZSlide + bootstrap
 
 ## Special thanks
 
