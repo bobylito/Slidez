@@ -34,11 +34,6 @@ object Application extends Controller {
     Ok(views.html.secret(streams))
   }
 
-  val broadcastForm = Form(
-    tuple(
-      "id" -> number,
-      "page" -> nonEmptyText,
-      "tick" -> number))
 /**
  * Creates the database entry and display the slides
  */
@@ -67,6 +62,12 @@ object Application extends Controller {
       })
       .getOrElse(BadRequest )
   }
+  
+  val broadcastForm = Form(
+    tuple(
+      "id" -> number,
+      "page" -> nonEmptyText,
+      "tick" -> number))
 
   /**
    * Update the state of the slides and broadcast the info to listeners
@@ -76,7 +77,6 @@ object Application extends Controller {
       formWithErrors => BadRequest("NOT GOOD! Try again"),
       {
         case (id, page, tick) =>
-          print(tick)
           LogSlide.insert(LogSlide(NotAssigned, id, page, tick))
           PresentationWorker.ref ! ChangePage(id, page)
           Ok("broadCast")

@@ -1,6 +1,5 @@
 @(idPresentation: Long, url: String)
 @main("SlideZ"){
-<title>Slidez</title>
 
 <div id="present">
   <iframe></iframe>
@@ -252,8 +251,13 @@
     if (aEvent.source === this.views.present) {
       if (argv[0] === "NOTES" && argc === 2)
         $("#notes > #content").innerHTML = this.notes = argv[1];
-      if (argv[0] === "REGISTERED" && argc === 3)
+      if (argv[0] === "REGISTERED" && argc === 3){
         $("#slidecount").innerHTML = argv[2];
+        jQuery.ajax(window.location.toString()+'?name='+argv[1], 
+          {
+           type:'PUT' 
+         });
+       }
     }
   }
   

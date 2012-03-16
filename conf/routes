@@ -9,6 +9,7 @@ POST    /broadCast                      controllers.Application.broadCast
 GET     /view/:id                       controllers.Application.view(id : Long)
 POST    /speakerview                    controllers.Application.speakerView
 GET     /speakerview/:id                controllers.Application.speakerViewAgain(id : Long)
+PUT     /speakerview/:id                controllers.Application.updateSlidesName(id : Long, name : String)
 GET     /viewStream/:id                 controllers.Application.viewStream(id : Long)
 PUT     /slides/:id                     controllers.Application.updateSlidesName(id: Long, name: String)
 
