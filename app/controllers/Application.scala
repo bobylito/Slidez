@@ -49,7 +49,8 @@ object Application extends Controller {
         LiveStream.create( LiveStream(NotAssigned, "Presentation hackday slidez", url) )
           .map(id => {
             PresentationWorker.ref ! NewPresentation(id)
-            Ok(views.html.speaker(id, url))
+            //Ok(views.html.speaker(id, url))
+            Redirect(routes.Application.speakerViewAgain(id))
           })
           .getOrElse( BadRequest )
         })
