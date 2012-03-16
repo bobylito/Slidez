@@ -4,6 +4,7 @@
 
 # Home page
 GET     /                               controllers.Application.index
+GET     /secret                         controllers.Application.secret
 POST    /broadCast                      controllers.Application.broadCast
 GET     /view/:id                       controllers.Application.view(id : Long)
 POST    /speakerview                    controllers.Application.speakerView

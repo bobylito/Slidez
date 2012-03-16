@@ -9,3 +9,5 @@ tmp
 .project
 .settings/
 *.class
+public/.DS_Store
+dist

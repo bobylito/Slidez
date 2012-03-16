@@ -27,6 +27,12 @@ object Application extends Controller {
     val streams = LiveStream.findAll()
     Ok(views.html.index(streams))
   }
+  
+  def secret = Action {
+    //live stream list 
+    val streams = LiveStream.findAll()
+    Ok(views.html.secret(streams))
+  }
 
   val broadcastForm = Form(
     tuple(
@@ -95,12 +101,11 @@ object Application extends Controller {
         AsyncResult {
           implicit val timeout = Timeout(5 second)
           (PresentationWorker.ref ? Listen(id)).mapTo[Enumerator[String]].asPromise.map({ in =>
-            SimpleResult(
-              header = ResponseHeader(OK, Map(
-                CONTENT_LENGTH -> "-1",
-                CACHE_CONTROL -> "no-cache",
-                CONTENT_TYPE -> "text/event-stream")),
-              in &> eventEnum)
+            Ok.stream( in &> eventEnum )
+              .withHeaders( 
+                ( CONTENT_LENGTH, "-1"),
+                ( CACHE_CONTROL, "no-cache"),
+                ( CONTENT_TYPE, "text/event-stream"))
           })
         }
       }
