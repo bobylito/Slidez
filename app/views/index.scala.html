@@ -4,19 +4,19 @@
 <div class="row">
   <div class="hero-unit span5">
     <h2>Hey you!</h2>
-    <p>This is slideZ! the platform to <strong>share</strong> what you have to <strong>say</strong> accross the <strong>world</strong>, and change the world one slide at a time. It uses cool, open, robust, lightweight technologies such as Play 2.</p>
-    <a href="" class="btn btn-large btn-info">Learn moar</a>
+    <p>This is slideZ! the platform to <strong>share</strong> what you have to <strong>say</strong> accross the <strong>world</strong>, and change the world one slide at a time. It uses cool, open, robust, lightweight technologies such as Play 2 and the web.</p>
+    <a href="https://github.com/bobylito/Slidez" class="btn btn-large btn-info" target="_blank">Learn more</a>
   </div>
 
   <div class="span5">
     <h2> Share the love</h2>
     <p>Enter the URL of your slidez and we'll do the rest of the job (well you'll have to turn pages)</p>
-    <p>If you have questions concerning the format of the slidez you should use <a href=#>go there</a></p>
     @helper.form(action=routes.Application.speakerView){
       <label for="url">Show me your slidez</label>
-      <input type="url" id="url" name="url"/>
+      <input type="url" id="url" name="url" placeholder="url"/>
       <input type="submit"/> 
     }
+    <p><em>Currently, slideZ! only supports <a href="https://github.com/paulrouget/dzslides">DZSlide</a> templates.</em></p>
     
     <h2>On air</h2>
     <ul>
