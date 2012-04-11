@@ -13,5 +13,7 @@ PUT     /speakerview/:id                controllers.Application.updateSlidesName
 GET     /viewStream/:id                 controllers.Application.viewStream(id : Long)
 PUT     /slides/:id                     controllers.Application.updateSlidesName(id: Long, name: String)
 
+POST    /login                          controllers.Login.verifyAssertion
+
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

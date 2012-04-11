@@ -8,6 +8,7 @@
         <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/main.css")">
         <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
         <script src="@routes.Assets.at("javascripts/jquery-1.7.1.min.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.at("javascripts/browser.id.min.js")" type="text/javascript"></script>
         <script src="@routes.Assets.at("bootstrap/js/bootstrap.js")" type="text/javascript"></script>
     </head>
     <script type="text/javascript">
@@ -20,6 +21,7 @@
     <div class="container">
       <h1 style="display:inline"><a href="/" style="color:#7A6A53">slideZ!</a></h1>
       <div style="display:inline;color:#AAA">Alpha</div>
+      <a href="#" id=signin>Sign in</a>
     </div>
   </div>
 </div>
@@ -35,6 +37,20 @@
 <hr />
 <p>Made with <a href="http://www.playframework.org/">Play2</a> and love by <a href="http://bobylito.me">AST</a>, JCH, JCB @@ <a href="http://www.zenexity.com">Zenexity</a>'s HACK DAY</p>
 </footer>
+
+<script type="text/javascript">
+  jQuery(function($){
+    var $signIn = $("#signin");
+    $signIn.click(function(){
+      navigator.id.get(function(assertion){
+        console.log(assertion);
+      $.post('/login',  {'assertion':assertion}, function(data){
+        console.log(data)
+      })
+      });
+    });
+  });
+</script>
 
 </body>
 </html>
