@@ -19,9 +19,11 @@
 <div id="head" class="navbar navbar-fixed-top">
   <div class="navbar-inner">
     <div class="container">
-      <h1 style="display:inline"><a href="/" style="color:#7A6A53">slideZ!</a></h1>
-      <div style="display:inline;color:#AAA">Alpha</div>
-      <a href="#" id=signin>Sign in</a>
+      <h1 style="display:inline">
+        <a class=brand href="/" style="color:#7A6A53;">slideZ!</a>
+        <small style="display:inline;color:#AAA">Alpha</small> 
+      </h1>
+      <a href="#" id=signin><img src="@routes.Assets.at("images/sign_in_blue.png")" alt="Sign in (with browserID)" /></a>
     </div>
   </div>
 </div>
@@ -41,7 +43,8 @@
 <script type="text/javascript">
   jQuery(function($){
     var $signIn = $("#signin");
-    $signIn.click(function(){
+    $signIn.click(function(e){
+      e.preventDefault();
       navigator.id.get(function(assertion){
         console.log(assertion);
       $.post('/login',  {'assertion':assertion}, function(data){

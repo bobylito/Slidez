@@ -2,12 +2,13 @@ package controllers
 
 import play.api._
 import play.api.mvc._
+import play.api.mvc.Security.Authenticated
 import play.api.libs.ws.WS
 
 import java.net.URLEncoder
 
 
-object Login extends Controller {
+object Login extends Controller with Secured{
 
   def verifyAssertion = Action { request => 
     request.body.asFormUrlEncoded.get("assertion").headOption.map(
@@ -19,16 +20,39 @@ object Login extends Controller {
                 ("assertion", assertion), 
                 ("audience", "http://localhost:9000"))
               .post("")
-              .map {
+              .map({
                 response => {
-                  Logger.info(response.status.toString())
-                  Logger.info(response.json.toString())
-                  Ok(response.json)
-              }
-            }
+                  if(response.status == 200){
+                    Logger.info(response.status.toString())
+                    Logger.info(response.json.toString())
+                    (response.json \ "email" ).asOpt[String]
+                      .map( { mail => 
+                                Ok(response.json).withSession(request.session + ("user.email" -> mail))
+                            })
+                      .getOrElse(
+                        BadRequest  
+                      )
+                  }
+                  else{
+                    BadRequest 
+                  }
+                }
+              })
           }
         }
-      ).getOrElse(BadRequest)
+    )
+    .getOrElse(BadRequest)
   }
 
+  def test =  isAuthenticated( (user, request) => Ok("Hello "+ user))
+
+}
+
+trait Secured {
+  private def getUsername(req : RequestHeader) = req.session.get("user.email")
+  private def notForYou(req : RequestHeader) = Results.Redirect(routes.Application.index)
+
+  def isAuthenticated( f : (String, Request[AnyContent]) => Result) = Security.Authenticated(getUsername, notForYou)({
+    user => Action(request => f(user, request))
+  })
 }
