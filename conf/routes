@@ -13,7 +13,8 @@ PUT     /speakerview/:id                controllers.Application.updateSlidesName
 GET     /viewStream/:id                 controllers.Application.viewStream(id : Long)
 PUT     /slides/:id                     controllers.Application.updateSlidesName(id: Long, name: String)
 
-POST    /login                          controllers.Login.verifyAssertion
+POST    /user/login                     controllers.Login.verifyAssertion
+GET     /user/signout                   controllers.Login.signout
 
 GET     /test                           controllers.Login.test
 

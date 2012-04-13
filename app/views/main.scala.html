@@ -1,4 +1,4 @@
-@(title: String)(content: Html)
+@(title: String, userEmail: Option[String])(content: Html)
 <!DOCTYPE html>
 <html>
     <head>
@@ -8,6 +8,7 @@
         <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/main.css")">
         <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
         <script src="@routes.Assets.at("javascripts/jquery-1.7.1.min.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.at("javascripts/underscore.min.js")" type="text/javascript"></script>
         <script src="@routes.Assets.at("javascripts/browser.id.min.js")" type="text/javascript"></script>
         <script src="@routes.Assets.at("bootstrap/js/bootstrap.js")" type="text/javascript"></script>
     </head>
@@ -16,42 +17,123 @@
     </script>
 <body >
 
-<div id="head" class="navbar navbar-fixed-top">
-  <div class="navbar-inner">
-    <div class="container">
-      <h1 style="display:inline">
-        <a class=brand href="/" style="color:#7A6A53;">slideZ!</a>
-        <small style="display:inline;color:#AAA">Alpha</small> 
-      </h1>
-      <a href="#" id=signin><img src="@routes.Assets.at("images/sign_in_blue.png")" alt="Sign in (with browserID)" /></a>
-    </div>
-  </div>
-</div>
 
 <section id="main" class="container">
+
+
+<div id="head" class="navbar">
+  <div class="navbar-inner">
+    <div class="container">
+      <a class=brand href="/" style="color:#7A6A53;">
+        slideZ!
+        <small style="display:inline; color:#AAA!important; font-size:small!important">Alpha</small> 
+      </a>
+      <div class="nav-collapse">
+        <ul class="nav pull-right">
+            @if(userEmail.isDefined){
+            <li class="hidden"> 
+              <a href="#" id="signin">
+              Sign in
+              </a>
+            </li>
+            } else { 
+            <li> 
+              <a href="#" id="signin">
+              Sign in
+              </a>
+            </li>
+            }
+          <li id="spinner" class="hidden">
+            <a>Verifying stuff...</a>
+          </li>
+          <li id="user-menu" class="dropdown
+            @userEmail.getOrElse("hidden") "
+          >
+          <a href="#" class="user-email" data-toggle="dropdown" href="#user-menu"> @userEmail
+            <b class="caret"></b>
+          </a>
+            <ul class="dropdown-menu">
+              <li><a href="#new-presentation" data-toggle="modal">New presentation</a></li>
+              <li><a href="#">Profile</a></li>
+              <li class=divider></li>
+              <li><a href="@routes.Login.signout()">Sign out</a></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+
+
+    </div> 
+  </div>
+</div>
 
 @content
 
 </section>
-
 
 <footer class=container>
 <hr />
 <p>Made with <a href="http://www.playframework.org/">Play2</a> and love by <a href="http://bobylito.me">AST</a>, JCH, JCB @@ <a href="http://www.zenexity.com">Zenexity</a>'s HACK DAY</p>
 </footer>
 
+
+<div class="modal hide fade" id="new-presentation">
+@helper.form(action=routes.Application.speakerView){
+  <div class="modal-header">
+    <a class="close" data-dismiss="modal">×</a>
+    <h3>Share</h3>
+  </div>
+  <div class="modal-body">
+    <p>Enter the URL of your slidez and we'll do the rest of the job (well you'll have to turn pages)</p>
+      <label for="url">Show me your slidez</label>
+      <input type="url" id="url" name="url" placeholder="url"/>
+    <p><em>Currently, slideZ! only supports <a href="https://github.com/paulrouget/dzslides">DZSlide</a> templates.</em></p>
+  </div>
+  <div class="modal-footer">
+    <a class="btn" data-toggle="modal" href="#new-presentation" >Close</a>
+    <input class="btn btn-primary" type="submit"/> 
+  </div>
+}
+</div>
+
+
 <script type="text/javascript">
   jQuery(function($){
-    var $signIn = $("#signin");
+    var $signIn = $("#signin"),
+        $userMenu = $("#user-menu"),
+        $newModal = $("#new-presentation"), 
+        $spinner = $("#spinner");
+
     $signIn.click(function(e){
       e.preventDefault();
       navigator.id.get(function(assertion){
+        if(!assertion){
+          return false;
+        }
         console.log(assertion);
-      $.post('/login',  {'assertion':assertion}, function(data){
-        console.log(data)
-      })
+        $signIn.addClass("hidden");
+        $spinner.removeClass("hidden");
+        $.ajax({
+          type: 'POST',
+          url: '@routes.Login.verifyAssertion()',
+          data: {'assertion':assertion},
+          success: function(data){
+            console.log(data);
+            $spinner.addClass("hidden");
+            $userMenu.find(".user-email").html(data.email);
+            $userMenu.removeClass("hidden");
+          },
+          error : function(){
+            $signIn.removeClass("hidden");
+            $spinner.addClass("hidden");
+          },
+          dataType: 'json' 
+        });
       });
     });
+
+    $newModal.modal({show:false});
+    $(".user-email").dropdown();
   });
 </script>
 

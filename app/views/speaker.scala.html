@@ -1,5 +1,5 @@
-@(idPresentation: Long, url: String)
-@main("SlideZ"){
+@(idPresentation: Long, url: String, userEmail: Option[String])
+@main("SlideZ", userEmail){
 
 <div id="present">
   <iframe></iframe>

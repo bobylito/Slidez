@@ -23,8 +23,8 @@ object Login extends Controller with Secured{
               .map({
                 response => {
                   if(response.status == 200){
-                    Logger.info(response.status.toString())
-                    Logger.info(response.json.toString())
+/*                    Logger.info(response.status.toString())
+                      Logger.info(response.json.toString())*/
                     (response.json \ "email" ).asOpt[String]
                       .map( { mail => 
                                 Ok(response.json).withSession(request.session + ("user.email" -> mail))
@@ -46,6 +46,9 @@ object Login extends Controller with Secured{
 
   def test =  isAuthenticated( (user, request) => Ok("Hello "+ user))
 
+  def signout = Action(request => 
+        Redirect(routes.Application.index()).withNewSession 
+      )
 }
 
 trait Secured {
@@ -55,4 +58,8 @@ trait Secured {
   def isAuthenticated( f : (String, Request[AnyContent]) => Result) = Security.Authenticated(getUsername, notForYou)({
     user => Action(request => f(user, request))
   })
+
+  def optionAuthenticated(f : (Option[String], Request[AnyContent]) => Result) = {
+    Action(request => f(getUsername(request), request))
+  }
 }

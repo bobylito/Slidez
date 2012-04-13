@@ -2,9 +2,18 @@
  * Colors based on Good Friends : http://www.colourlovers.com/palette/77121/Good_Friends#
  * */
 *{color : #948C75}
-body{background : #D5DED9; padding-top: 60px; padding-bottom:40px}
+body{background : #D5DED9;}
 h1, h2, h3{ color : #7A6A53}
 iframe{border:none}
 
 #head {background: #D9CEB2}
 .hero-unit{background-color:rgba(238, 238, 238,0.4)}
+
+#head .navbar-inner{
+  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: 4px;
+}
+
+.hidden{
+  display:none!important
+}

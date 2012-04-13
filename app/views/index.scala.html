@@ -1,6 +1,6 @@
-@(livePrez : Seq[models.LiveStream])
+@(livePrez : Seq[models.LiveStream], userEmail : Option[String])
 
-@main("slideZ!"){
+@main("slideZ!", userEmail){
 <div class="row">
   <div class="hero-unit span5">
     <h2>Hey you!</h2>
@@ -9,14 +9,6 @@
   </div>
 
   <div class="span5">
-    <h2> Share the love</h2>
-    <p>Enter the URL of your slidez and we'll do the rest of the job (well you'll have to turn pages)</p>
-    @helper.form(action=routes.Application.speakerView){
-      <label for="url">Show me your slidez</label>
-      <input type="url" id="url" name="url" placeholder="url"/>
-      <input type="submit"/> 
-    }
-    <p><em>Currently, slideZ! only supports <a href="https://github.com/paulrouget/dzslides">DZSlide</a> templates.</em></p>
     
     <h2>On air</h2>
     <ul>

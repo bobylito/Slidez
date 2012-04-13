@@ -17,22 +17,22 @@ import actors.PresentationWorker._
 import anorm._
 import models.LogSlide
 
-object Application extends Controller {
+object Application extends Controller with Secured {
 
   /** 
    *  INDEX 
    */
-  def index = Action {
+  def index = optionAuthenticated( { (user, request) => 
     //live stream list 
     val streams = LiveStream.findAll()
-    Ok(views.html.index(streams))
-  }
+    Ok(views.html.index(streams, user))
+  })
   
-  def secret = Action {
+  def secret = optionAuthenticated( { (user, request) => 
     //live stream list 
     val streams = LiveStream.findAll()
-    Ok(views.html.secret(streams))
-  }
+    Ok(views.html.secret(streams, user))
+  })
 
 /**
  * Creates the database entry and display the slides
@@ -55,13 +55,13 @@ object Application extends Controller {
   /**
    * Restore a previously entered presentation
    */
-  def speakerViewAgain(id: Long) = Action { request =>
+  def speakerViewAgain(id: Long) = optionAuthenticated( (user, request) =>
     LiveStream.findById(id)
       .map( l => {
-        Ok(views.html.speaker(l.id.get, l.url))
+        Ok(views.html.speaker(l.id.get, l.url, user))
       })
       .getOrElse(BadRequest )
-  }
+  )
   
   val broadcastForm = Form(
     tuple(
@@ -88,11 +88,11 @@ object Application extends Controller {
     Ok("Updated")
   }
 
-  def view(id: Long) = Action { request =>
+  def view(id: Long) = optionAuthenticated( (user, request) =>
     LiveStream.findById(id)
-      .map(l => {Ok(views.html.view(l.url, l.id.get, LogSlide.lastShownSlide(id)))})
+      .map(l => {Ok(views.html.view(l.url, l.id.get, LogSlide.lastShownSlide(id), user))})
       .getOrElse( { BadRequest })
-  }
+  )
 
   val eventEnum = SSEvent[String](eventName = "page-change")
 
@@ -115,5 +115,4 @@ object Application extends Controller {
       }
     }
   }
-
 }
