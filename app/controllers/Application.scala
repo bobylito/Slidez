@@ -19,6 +19,8 @@ import models.LogSlide
 
 object Application extends Controller with Secured {
 
+  import akka.pattern.ask
+
   /** 
    *  INDEX 
    */
@@ -101,7 +103,7 @@ object Application extends Controller with Secured {
       case Some(l: LiveStream) => {
         AsyncResult {
           implicit val timeout = Timeout(5 second)
-          (PresentationWorker.ref ? Listen(id)).mapTo[Enumerator[String]].asPromise.map({ in =>
+          (PresentationWorker.ref ? Listen(id) ).mapTo[Enumerator[String]].asPromise.map({ in =>
             Ok.stream( in &> eventEnum )
               .withHeaders( 
                 ( CONTENT_LENGTH, "-1"),

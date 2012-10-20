@@ -15,27 +15,31 @@ object Login extends Controller with Secured{
         assertion => {
           //TODO Verify assertion
           Async{
-            WS.url("https://browserid.org/verify")
+            WS.url("https://verifier.login.persona.org/verify")
               .withQueryString(
                 ("assertion", assertion), 
-                ("audience", "http://localhost:9000"))
+                ("audience", "http://localhost:9001"))
               .post("")
-              .map({
-                response => {
-                  if(response.status == 200){
-/*                    Logger.info(response.status.toString())
-                      Logger.info(response.json.toString())*/
-                    (response.json \ "email" ).asOpt[String]
-                      .map( { mail => 
-                                Ok(response.json).withSession(request.session + ("user.email" -> mail))
-                            })
-                      .getOrElse(
-                        BadRequest  
-                      )
+              .map({ response => 
+                if(response.status == 200){
+                  (response.json \ "status").asOpt[String] match {
+                    case Some( "okay")  => {
+                      (response.json \ "email" ).asOpt[String].map( { mail => 
+                          Ok(response.json).withSession(request.session + ("user.email" -> mail))
+                        } ).getOrElse( {
+                          BadRequest  
+                        } )
+                    }
+                    case Some("failure") => {
+                      BadRequest(response.json)
+                    }
+                    case _ => {
+                      BadRequest("Erreur")
+                    }
                   }
-                  else{
-                    BadRequest 
-                  }
+                }
+                else {
+                  BadRequest("Something went wrong with the persona ws")
                 }
               })
           }
